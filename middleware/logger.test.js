@@ -11,7 +11,7 @@ describe('logging', () => {
     jest.resetModules();
   });
 
-  test('should set pass prod options when NODE_ENV=production', done  => {
+  it('should set pass prod options when NODE_ENV=production', done  => {
     jest.isolateModules(() => {
       pino = require('pino');
       koaPino = require('koa-pino-logger');
@@ -25,7 +25,7 @@ describe('logging', () => {
     });
   });
 
-  test('should set pass dev options when NODE_ENV != production', done  => {
+  it('should set pass dev options when NODE_ENV != production', done  => {
     jest.isolateModules(() => {
       const devOpts = {prettyPrint: true};
       pino = require('pino');

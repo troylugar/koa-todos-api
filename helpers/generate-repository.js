@@ -157,7 +157,7 @@ function generateRepositoryHandlers(model) {
  * @param {RepositoryHandlers} handlers 
  * @returns {void}
  */
-function attachHandlersToDefaultRoutes(router, handlers) {
+function registerHandlersToDefaultRoutes(router, handlers) {
   router.get('/', handlers.find);
   router.post('/', handlers.save);
   router.get('/:id', handlers.findById);
@@ -167,5 +167,5 @@ function attachHandlersToDefaultRoutes(router, handlers) {
 
 module.exports = {
   generateRepositoryHandlers,
-  attachHandlersToDefaultRoutes
+  registerHandlersToDefaultRoutes
 };

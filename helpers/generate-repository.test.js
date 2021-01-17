@@ -9,7 +9,7 @@ jest.mock('../middleware/logger', () => ({
 const { logger } = require('../middleware/logger');
 const {
   generateRepositoryHandlers,
-  attachHandlersToDefaultRoutes
+  registerHandlersToDefaultRoutes
 } = require('./generate-repository');
 
 const schema = new Schema({ title: String });
@@ -374,7 +374,7 @@ describe('generateRepositoryHandlers', () => {
   });
 });
 
-describe('attachHandlersToDefaultRoutes', () => {
+describe('registerHandlersToDefaultRoutes', () => {
   let handlers, fakeRouter;
 
   beforeAll(() => {
@@ -386,7 +386,7 @@ describe('attachHandlersToDefaultRoutes', () => {
       delete: jest.fn(),
     };
 
-    attachHandlersToDefaultRoutes(fakeRouter, handlers);
+    registerHandlersToDefaultRoutes(fakeRouter, handlers);
   });
 
   it('should route GET / to handlers.find', () => {
