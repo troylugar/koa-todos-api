@@ -59,7 +59,7 @@ function generateRepositoryHandlers(model) {
     const log = {
       ...baseLog,
       action: 'findById',
-      params: { ...ctx.params }
+      params: ctx.params
     };
 
     try {
@@ -133,7 +133,7 @@ function generateRepositoryHandlers(model) {
     const log = {
       ...baseLog,
       action: 'findByIdAndDelete',
-      params: { ...ctx.params }
+      params: ctx.params
     };
 
     try {
