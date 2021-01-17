@@ -380,10 +380,10 @@ describe('registerHandlersToDefaultRoutes', () => {
   beforeAll(() => {
     handlers = generateRepositoryHandlers(testModel);
     fakeRouter = {
-      get: jest.fn(),
-      post: jest.fn(),
-      patch: jest.fn(),
-      delete: jest.fn(),
+      get: jest.fn(() => fakeRouter),
+      post: jest.fn(() => fakeRouter),
+      patch: jest.fn(() => fakeRouter),
+      delete: jest.fn(() => fakeRouter),
     };
 
     registerHandlersToDefaultRoutes(fakeRouter, handlers);

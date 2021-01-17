@@ -22,134 +22,133 @@ const { logger } = require('../middleware/logger');
  * @param {import('mongoose').Document} model
  * @returns {RepositoryHandlers}
  */
-function generateRepositoryHandlers(model) {
+module.exports.generateRepositoryHandlers = (model) => {
   const baseLog = {
     model: model.modelName,
     result: null
   };
-  const repositoryHandlers = {};
 
-  /** @type {AsyncKoaHandler} */
-  repositoryHandlers.find = async (ctx) => {
-    const log = {
-      ...baseLog,
-      action: 'find'
-    };
+  return {
+    /** @type {AsyncKoaHandler} */
+    find: async (ctx) => {
+      const log = {
+        ...baseLog,
+        action: 'find'
+      };
 
-    try {
-      const result = await model.find({});
-      log.result = result;
-      ctx.body = result;
-      ctx.status = 200;
-    } catch (error) {
-      ctx.throw(error.message);
-      logger.error(error);
-    } finally {
-      const msg = `${log.model}.${log.action}()`;
-      logger.info(log, msg);
-    }
-  };
-
-  /** @type {AsyncKoaHandler} */
-  repositoryHandlers.findById = async (ctx) => {
-    /** 
-     * @todo type definition should show ctx.params.id as required
-     */
-    const { id } = ctx.params;
-    const log = {
-      ...baseLog,
-      action: 'findById',
-      params: ctx.params
-    };
-
-    try {
-      const result = await model.findById(id);
-      log.result = result;
-      if (result === null) {
-        ctx.status = 404;
-      } else {
+      try {
+        const result = await model.find({});
+        log.result = result;
         ctx.body = result;
         ctx.status = 200;
+      } catch (error) {
+        ctx.throw(error.message);
+        logger.error(error);
+      } finally {
+        const msg = `${log.model}.${log.action}()`;
+        logger.info(log, msg);
       }
-    } catch (error) {
-      ctx.throw(error.message);
-      logger.error(error);
-    } finally {
-      const msg = `${log.model}.${log.action}(${log.params.id})`;
-      logger.info(log, msg);
+    },
+
+    /** @type {AsyncKoaHandler} */
+    findById: async (ctx) => {
+      /** 
+       * @todo type definition should show ctx.params.id as required
+       */
+      const { id } = ctx.params;
+      const log = {
+        ...baseLog,
+        action: 'findById',
+        params: ctx.params
+      };
+
+      try {
+        const result = await model.findById(id);
+        log.result = result;
+        if (result === null) {
+          ctx.status = 404;
+        } else {
+          ctx.body = result;
+          ctx.status = 200;
+        }
+      } catch (error) {
+        ctx.throw(error.message);
+        logger.error(error);
+      } finally {
+        const msg = `${log.model}.${log.action}(${log.params.id})`;
+        logger.info(log, msg);
+      }
+    },
+
+    /** @type {AsyncKoaHandler} */
+    save: async (ctx) => {
+      const { body } = ctx.request;
+      const log = {
+        ...baseLog,
+        action: 'save',
+        request: body
+      };
+
+      try {
+        const entity = new model(body);
+        const result = await entity.save();
+        log.result = result;
+        ctx.body = result;
+        ctx.status = 201;
+      } catch (error) {
+        ctx.throw(error.message);
+        logger.error(error);
+      } finally {
+        const msg = `${log.model}.${log.action}()`;
+        logger.info(log, msg);
+      }
+    },
+
+    /** @type {AsyncKoaHandler} */
+    findByIdAndUpdate: async (ctx) => {
+      const { id } = ctx.params;
+      const { body } = ctx.request;
+      const log = {
+        ...baseLog,
+        action: 'findByIdAndUpdate',
+        request: body,
+        params: ctx.params
+      };
+
+      try {
+        log.result = await model.findByIdAndUpdate(id, body);
+        ctx.status = 204;
+      } catch (error) {
+        ctx.throw(error.message);
+        logger.error(error);
+      } finally {
+        const msg = `${log.model}.${log.action}(${log.params.id})`;
+        logger.info(log, msg);
+      }
+    },
+
+    /** @type {AsyncKoaHandler} */
+    findByIdAndDelete: async (ctx) => {
+      const { id } = ctx.params;
+      const log = {
+        ...baseLog,
+        action: 'findByIdAndDelete',
+        params: ctx.params
+      };
+
+      try {
+        log.result = await model.findByIdAndDelete(id);
+        ctx.status = 204;
+      } catch (error) {
+        ctx.throw(error.message);
+        logger.error(error);
+      } finally {
+        const msg = `${log.model}.${log.action}(${log.params.id})`;
+        logger.info(log, msg);
+      }
     }
   };
-
-  /** @type {AsyncKoaHandler} */
-  repositoryHandlers.save = async (ctx) => {
-    const { body } = ctx.request;
-    const log = {
-      ...baseLog,
-      action: 'save',
-      request: body
-    };
-
-    try {
-      const entity = new model(body);
-      const result = await entity.save();
-      log.result = result;
-      ctx.body = result;
-      ctx.status = 201;
-    } catch (error) {
-      ctx.throw(error.message);
-      logger.error(error);
-    } finally {
-      const msg = `${log.model}.${log.action}()`;
-      logger.info(log, msg);
-    }
-  };
-
-  /** @type {AsyncKoaHandler} */
-  repositoryHandlers.findByIdAndUpdate = async (ctx) => {
-    const { id } = ctx.params;
-    const { body } = ctx.request;
-    const log = {
-      ...baseLog,
-      action: 'findByIdAndUpdate',
-      request: body,
-      params: ctx.params
-    };
-
-    try {
-      log.result = await model.findByIdAndUpdate(id, body);
-      ctx.status = 204;
-    } catch (error) {
-      ctx.throw(error.message);
-      logger.error(error);
-    } finally {
-      const msg = `${log.model}.${log.action}(${log.params.id})`;
-      logger.info(log, msg);
-    }
-  };
-
-  /** @type {AsyncKoaHandler} */
-  repositoryHandlers.findByIdAndDelete = async (ctx) => {
-    const { id } = ctx.params;
-    const log = {
-      ...baseLog,
-      action: 'findByIdAndDelete',
-      params: ctx.params
-    };
-
-    try {
-      log.result = await model.findByIdAndDelete(id);
-      ctx.status = 204;
-    } catch (error) {
-      ctx.throw(error.message);
-      logger.error(error);
-    } finally {
-      const msg = `${log.model}.${log.action}(${log.params.id})`;
-      logger.info(log, msg);
-    }
-  };
-
-  return repositoryHandlers;
-}
+};
 
 /**
  * Attaches handlers to their default routes
@@ -157,15 +156,10 @@ function generateRepositoryHandlers(model) {
  * @param {RepositoryHandlers} handlers 
  * @returns {void}
  */
-function registerHandlersToDefaultRoutes(router, handlers) {
-  router.get('/', handlers.find);
-  router.post('/', handlers.save);
-  router.get('/:id', handlers.findById);
-  router.patch('/:id', handlers.findByIdAndUpdate);
-  router.delete('/:id', handlers.findByIdAndDelete);
-}
-
-module.exports = {
-  generateRepositoryHandlers,
-  registerHandlersToDefaultRoutes
-};
+module.exports.registerHandlersToDefaultRoutes = (router, handlers) =>
+  router
+    .get('/', handlers.find)
+    .post('/', handlers.save)
+    .get('/:id', handlers.findById)
+    .patch('/:id', handlers.findByIdAndUpdate)
+    .delete('/:id', handlers.findByIdAndDelete);
