@@ -2,7 +2,7 @@ jest.mock('mongoose', () => ({
   connection: { readyState: 1 }
 }));
 const mongoose = require('mongoose');
-const healthcheck = require('./health-check');
+const healthcheck = require('../../src/middleware/health-check');
 const Koa = require('koa');
 const supertest = require('supertest');
 const mockdate = require('mockdate');

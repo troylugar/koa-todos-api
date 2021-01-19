@@ -4,7 +4,7 @@ describe('logging', () => {
   beforeEach(() => {
     jest.mock('pino');
     jest.mock('koa-pino-logger');
-    jest.mock('../helpers/config');
+    jest.mock('../../src/helpers/config');
   });
 
   afterEach(() => {
@@ -15,9 +15,9 @@ describe('logging', () => {
     jest.isolateModules(() => {
       pino = require('pino');
       koaPino = require('koa-pino-logger');
-      config = require('../helpers/config');
-      config.NODE_ENV = 'production';
-      const { requestLogger } = require('./logger');
+      config = require('../../src/helpers/config');
+      config.node_env = 'production';
+      const { requestLogger } = require('../../src/middleware/logger');
       requestLogger();
       expect(pino).toHaveBeenCalledWith({});
       expect(koaPino).toHaveBeenCalledWith({});
@@ -30,9 +30,9 @@ describe('logging', () => {
       const devOpts = {prettyPrint: true};
       pino = require('pino');
       koaPino = require('koa-pino-logger');
-      config = require('../helpers/config');
-      delete config.NODE_ENV;
-      const { requestLogger } = require('./logger');
+      config = require('../../src/helpers/config');
+      delete config.node_env;
+      const { requestLogger } = require('../../src/middleware/logger');
       requestLogger();
       expect(pino).toHaveBeenCalledWith(devOpts);
       expect(koaPino).toHaveBeenCalledWith(devOpts);
