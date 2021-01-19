@@ -4,7 +4,7 @@ const config = require('../helpers/config');
 
 let devOpts = {};
 
-if (config.NODE_ENV !== 'production') {
+if (config.node_env !== 'production') {
   devOpts = {
     prettyPrint: true
   };

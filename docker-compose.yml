@@ -9,7 +9,7 @@ services:
     environment:
       - MONGO_URI=mongodb://mongoadmin:secret@db:27017/todos?authSource=admin
     depends_on:
-      - "db"
+      - db
     command: bash -c "
       wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&
       chmod +x ./wait-for-it.sh &&

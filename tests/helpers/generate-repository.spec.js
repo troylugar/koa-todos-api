@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-jest.mock('../middleware/logger', () => ({
+jest.mock('../../src/middleware/logger', () => ({
   logger: {
     info: jest.fn(),
     error: jest.fn()
   }
 }));
-const { logger } = require('../middleware/logger');
+const { logger } = require('../../src/middleware/logger');
 const {
   generateRepositoryHandlers,
   registerHandlersToDefaultRoutes
-} = require('./generate-repository');
+} = require('../../src/helpers/generate-repository');
 
 const schema = new Schema({ title: String });
 const testModel = mongoose.model('Item', schema);
