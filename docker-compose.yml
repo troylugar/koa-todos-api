@@ -8,6 +8,8 @@ services:
       - "49160"
     environment:
       - MONGO_URI=mongodb://mongoadmin:secret@db:27017/todos?authSource=admin
+      - NODE_ENV=production
+    # env_file: ${NODE_ENV}.env
     depends_on:
       - db
     command: bash -c "
