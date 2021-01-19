@@ -17,19 +17,28 @@ const testModel = mongoose.model('Item', schema);
 
 describe('generateRepositoryHandlers', () => {
   describe('find', () => {
-    const fakeModel = { ...testModel };
-    const ctx = {
-      throw: jest.fn()
-    };
+    let ctx, fakeModel, handlers;
+
+    beforeEach(async () => {
+      ctx = {
+        throw: jest.fn()
+      };
+      fakeModel = { ...testModel };
+      handlers = generateRepositoryHandlers(fakeModel);
+    });
+
+    afterEach(() => {
+      logger.info.mockClear();
+    });
 
     describe('successful behavior', () => {
-      const handlers = generateRepositoryHandlers(fakeModel);
-      const results = [
-        { title: 'First' },
-        { title: 'Second' }
-      ];
+      let results;
 
-      beforeAll(async () => {
+      beforeEach(async () => {
+        results = [
+          { title: 'First' },
+          { title: 'Second' }
+        ];
         fakeModel.find = jest.fn(() => results);
         await handlers.find(ctx);
       });
@@ -54,10 +63,10 @@ describe('generateRepositoryHandlers', () => {
     });
 
     describe('error behavior', () => {
-      const mongoError = new Error('mongo error');
-      const handlers = generateRepositoryHandlers(fakeModel);
+      let mongoError;
 
-      beforeAll(async () => {
+      beforeEach(async () => {
+        mongoError = new Error('mongo error');
         fakeModel.find = jest.fn(() => {
           throw mongoError;
         });
@@ -85,18 +94,28 @@ describe('generateRepositoryHandlers', () => {
   });
 
   describe('findById', () => {
-    const fakeModel = { ...testModel };
-    describe('successful behavior', () => {
-      const ctx = {
-        params: {
-          id: 1234
-        },
-        throw: jest.fn()
-      };
-      const handlers = generateRepositoryHandlers(fakeModel);
-      const results = { title: 'First' };
+    let fakeModel;
 
-      beforeAll(async () => {
+    beforeEach(() => {
+      fakeModel = { ...testModel };
+    });
+
+    afterEach(() => {
+      logger.info.mockClear();
+    });
+
+    describe('successful behavior', () => {
+      let ctx, handlers, results;
+
+      beforeEach(async () => {
+        ctx = {
+          params: {
+            id: 1234
+          },
+          throw: jest.fn()
+        };
+        handlers = generateRepositoryHandlers(fakeModel);
+        results = { title: 'First' };
         fakeModel.findById = jest.fn(() => results);
         await handlers.findById(ctx);
       });
@@ -129,16 +148,17 @@ describe('generateRepositoryHandlers', () => {
     });
 
     describe('error behavior', () => {
-      const ctx = {
-        params: {
-          id: 1234
-        },
-        throw: jest.fn()
-      };
-      const mongoError = new Error('mongo error');
-      const handlers = generateRepositoryHandlers(fakeModel);
+      let ctx, handlers, mongoError;
 
-      beforeAll(async () => {
+      beforeEach(async () => {
+        ctx = {
+          params: {
+            id: 1234
+          },
+          throw: jest.fn()
+        };
+        mongoError = new Error('mongo error');
+        handlers = generateRepositoryHandlers(fakeModel);
         fakeModel.findById = jest.fn(() => {
           throw mongoError;
         });
@@ -167,22 +187,27 @@ describe('generateRepositoryHandlers', () => {
   });
 
   describe('save', () => {
-    const ctx = {
-      request: {
-        body: {
-          title: 'this is the title'
-        }
-      },
-      throw: jest.fn()
-    };
-    describe('successful behavior', () => {
-      const fakeModel = jest.fn().mockImplementation(body => ({
-        save: jest.fn(() => body)
-      }));
-      const handlers = generateRepositoryHandlers(fakeModel);
-      const results = { ...ctx.request.body };
+    let ctx;
+    beforeEach(async () => {
+      ctx = {
+        request: {
+          body: {
+            title: 'this is the title'
+          }
+        },
+        throw: jest.fn()
+      };
+    });
 
-      beforeAll(async () => {
+    describe('successful behavior', () => {
+      let fakeModel, handlers, results;
+
+      beforeEach(async () => {
+        fakeModel = jest.fn().mockImplementation(body => ({
+          save: jest.fn(() => body)
+        }));
+        handlers = generateRepositoryHandlers(fakeModel);
+        results = { ...ctx.request.body };
         await handlers.save(ctx);
       });
 
@@ -207,13 +232,14 @@ describe('generateRepositoryHandlers', () => {
     });
 
     describe('error behavior', () => {
-      const mongoError = new Error('mongo error');
-      const fakeModel = jest.fn().mockImplementation(() => ({
-        save: jest.fn(() => { throw mongoError; })
-      }));
-      const handlers = generateRepositoryHandlers(fakeModel);
+      let mongoError, fakeModel, handlers;
 
-      beforeAll(async () => {
+      beforeEach(async () => {
+        mongoError = new Error('mongo error');
+        fakeModel = jest.fn().mockImplementation(() => ({
+          save: jest.fn(() => { throw mongoError; })
+        }));
+        handlers = generateRepositoryHandlers(fakeModel);
         await handlers.save(ctx);
       });
 
@@ -239,29 +265,49 @@ describe('generateRepositoryHandlers', () => {
   });
 
   describe('findByIdAndUpdate', () => {
-    const ctx = {
-      params: {
-        id: 1234
-      },
-      request: {
-        body: {
-          title: 'this is the title'
-        }
-      },
-      throw: jest.fn()
-    };
+    let ctx;
+
+    beforeEach(async () => {
+      ctx = {
+        params: {
+          id: 1234
+        },
+        request: {
+          body: {
+            title: 'this is the title'
+          }
+        },
+        throw: jest.fn()
+      };
+    });
+
+    afterEach(() => {
+      logger.info.mockClear();
+    });
 
     describe('successful behavior', () => {
-      const fakeModel = jest.fn();
-      fakeModel.findByIdAndUpdate = jest.fn();
-      const handlers = generateRepositoryHandlers(fakeModel);
+      let fakeModel, handlers;
 
-      beforeAll(async () => {
+      beforeEach(async () => {
+        fakeModel = jest.fn();
+        fakeModel.findByIdAndUpdate = jest.fn().mockReturnValue({});
+        handlers = generateRepositoryHandlers(fakeModel);
         await handlers.findByIdAndUpdate(ctx);
       });
 
-      it('should return a 201 status code', () => {
+      it('should return an empty body when updated', () => {
+        expect(ctx.body).toBeUndefined();
+      });
+
+      it('should return a 204 status code when updated', () => {
         expect(ctx.status).toBe(204);
+      });
+
+      it('should return a 404 status code when not found', async (done) => {
+        fakeModel.findByIdAndUpdate = jest.fn().mockReturnValue(null);
+        await handlers.findByIdAndUpdate(ctx);
+        expect(ctx.status).toBe(404);
+        done();
       });
 
       it('should log results in info', () => {
@@ -270,6 +316,7 @@ describe('generateRepositoryHandlers', () => {
           action: 'findByIdAndUpdate',
           params: ctx.params,
           request: ctx.request.body,
+          result: {}
         };
         const msg = `${fakeModel.modelName}.${log.action}(${ctx.params.id})`;
         expect(logger.info).toHaveBeenCalledWith(log, msg);
@@ -277,14 +324,15 @@ describe('generateRepositoryHandlers', () => {
     });
 
     describe('error behavior', () => {
-      const mongoError = new Error('mongo error');
-      const fakeModel = jest.fn();
-      fakeModel.findByIdAndUpdate = jest.fn(() => {
-        throw mongoError;
-      });
-      const handlers = generateRepositoryHandlers(fakeModel);
+      let mongoError, fakeModel, handlers;
 
-      beforeAll(async () => {
+      beforeEach(async () => {
+        mongoError = new Error('mongo error');
+        fakeModel = jest.fn();
+        fakeModel.findByIdAndUpdate = jest.fn(() => {
+          throw mongoError;
+        });
+        handlers = generateRepositoryHandlers(fakeModel);
         await handlers.findByIdAndUpdate(ctx);
       });
 
@@ -301,7 +349,8 @@ describe('generateRepositoryHandlers', () => {
           model: fakeModel.modelName,
           action: 'findByIdAndUpdate',
           params: ctx.params,
-          request: ctx.request.body
+          request: ctx.request.body,
+          result: null
         };
         const msg = `${fakeModel.modelName}.${log.action}(${ctx.params.id})`;
         expect(logger.info).toHaveBeenCalledWith(log, msg);
@@ -310,24 +359,39 @@ describe('generateRepositoryHandlers', () => {
   });
 
   describe('findByIdAndDelete', () => {
-    const ctx = {
-      params: {
-        id: 1234
-      },
-      throw: jest.fn()
-    };
+    let ctx;
+
+    beforeEach(async () => {
+      ctx = {
+        params: {
+          id: 1234
+        },
+        throw: jest.fn()
+      };
+    });
 
     describe('successful behavior', () => {
-      const fakeModel = jest.fn();
-      fakeModel.findByIdAndDelete = jest.fn();
-      const handlers = generateRepositoryHandlers(fakeModel);
+      let fakeModel, handlers;
 
-      beforeAll(async () => {
+      beforeEach(async () => {
+        fakeModel = jest.fn();
+        fakeModel.findByIdAndDelete = jest.fn();
+        handlers = generateRepositoryHandlers(fakeModel);
         await handlers.findByIdAndDelete(ctx);
       });
 
-      it('should return a 201 status code', () => {
+      it('should return an empty body when updated', () => {
+        expect(ctx.body).toBeUndefined();
+      });
+      it('should return a 204 status code when updated', () => {
         expect(ctx.status).toBe(204);
+      });
+
+      it('should return a 404 status code when not found', async (done) => {
+        fakeModel.findByIdAndDelete = jest.fn().mockReturnValue(null);
+        await handlers.findByIdAndDelete(ctx);
+        expect(ctx.status).toBe(404);
+        done();
       });
 
       it('should log results in info', () => {
@@ -342,14 +406,15 @@ describe('generateRepositoryHandlers', () => {
     });
 
     describe('error behavior', () => {
-      const mongoError = new Error('mongo error');
-      const fakeModel = jest.fn();
-      fakeModel.findByIdAndDelete = jest.fn(() => {
-        throw mongoError;
-      });
-      const handlers = generateRepositoryHandlers(fakeModel);
+      let mongoError, fakeModel, handlers;
 
-      beforeAll(async () => {
+      beforeEach(async () => {
+        mongoError = new Error('mongo error');
+        fakeModel = jest.fn();
+        fakeModel.findByIdAndDelete = jest.fn(() => {
+          throw mongoError;
+        });
+        handlers = generateRepositoryHandlers(fakeModel);
         await handlers.findByIdAndDelete(ctx);
       });
 

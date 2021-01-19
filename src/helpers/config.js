@@ -7,5 +7,5 @@ if (process.env.NODE_ENV !== 'production') {
 module.exports = {
   port: +process.env.PORT || 3000,
   mongo_uri: process.env.MONGO_URI,
-  node_env: process.env.node_env
+  node_env: process.env.NODE_ENV
 };

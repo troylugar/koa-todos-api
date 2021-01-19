@@ -36,3 +36,5 @@ server.listen(config.port, '0.0.0.0', () => {
   process.on('uncaughtException', gracefulShutdown);
   process.on('unhandledRejection', gracefulShutdown);
 });
+
+module.exports = server;

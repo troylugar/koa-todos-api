@@ -14,7 +14,9 @@ mongoose.connect(config.mongo_uri, {
   useNewUrlParser: true
 });
 const db = mongoose.connection;
-db.on('error', logger.error);
+db.on('error', error => {
+  logger.error(error);
+});
 db.once('connected', () => {
   logger.info('Mongo connected');
   app.emit('ready');

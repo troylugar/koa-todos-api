@@ -116,8 +116,9 @@ module.exports.generateRepositoryHandlers = (model) => {
       };
 
       try {
-        log.result = await model.findByIdAndUpdate(id, body);
-        ctx.status = 204;
+        const result = await model.findByIdAndUpdate(id, body);
+        log.result = result;
+        ctx.status = (result === null) ? 404 : 204;
       } catch (error) {
         ctx.throw(error.message);
         logger.error(error);
@@ -137,8 +138,9 @@ module.exports.generateRepositoryHandlers = (model) => {
       };
 
       try {
-        log.result = await model.findByIdAndDelete(id);
-        ctx.status = 204;
+        const result = await model.findByIdAndDelete(id);
+        log.result = result;
+        ctx.status = (result === null) ? 404 : 204;
       } catch (error) {
         ctx.throw(error.message);
         logger.error(error);
