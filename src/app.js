@@ -1,32 +1,12 @@
 const Koa = require('koa');
-const mongoose = require('mongoose');
+const Router = require('koa-router');
 const cors = require('koa2-cors');
 const helmet = require('koa-helmet');
 const bodyParser = require('koa-bodyparser');
-const config = require('./helpers/config');
-const { logger, requestLogger } = require('./middleware/logger');
+const requestLogger = require('./middleware/request-logger');
 const healthcheck = require('./middleware/health-check');
-const api = require('./api/index');
-
-// setup db
-mongoose.connect(config.mongo_uri, {
-  useUnifiedTopology: true,
-  useNewUrlParser: true
-});
-const db = mongoose.connection;
-db.on('error', error => {
-  logger.error(error);
-});
-db.once('connected', () => {
-  logger.info('Mongo connected');
-  app.emit('ready');
-});
-db.on('reconnected', () => {
-  logger.info('Mongo re-connected');
-});
-db.on('disconnected', () => {
-  logger.info('Mongo disconnected');
-});
+const generateRouter = require('./utilities/generate-router');
+const todoController = require('./controllers/todos');
 
 // setup app
 const app = new Koa();
@@ -41,6 +21,9 @@ app.use(cors({
 app.use(healthcheck());
 
 // setup routes
-app.use(api.routes());
+const todoRouter = generateRouter(todoController);
+const router = new Router({ prefix: '/api' });
+router.use('/todos', todoRouter.routes());
+app.use(router.routes());
 
 module.exports = app;

@@ -1,22 +1,38 @@
 const http = require('http');
 const mongoose = require('mongoose');
-const config = require('./helpers/config');
-const { logger } = require('./middleware/logger');
+const config = require('./utilities/config');
+const logger = require('./utilities/logger');
 const app = require('./app');
+
+mongoose.connect(config.mongo_uri, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true
+});
+const db = mongoose.connection;
+db.on('error', error => {
+  logger.error(error);
+});
+db.once('connected', () => {
+  logger.info('Mongo connected');
+  app.emit('ready');
+});
+db.on('reconnected', () => {
+  logger.info('Mongo re-connected');
+});
+db.on('disconnected', () => {
+  logger.info('Mongo disconnected');
+});
 
 const server = http.createServer(app.callback());
 
 async function gracefulShutdown(err) {
-  // log errors
   if (err) {
     logger.error(err);
   }
 
-  // close mongo connection
   await mongoose.connection.close(false);
   logger.info('Mongo connection has closed.');
 
-  // close server connection
   server.close((serverError) => {
     if (serverError) {
       logger.error(serverError);
@@ -27,7 +43,6 @@ async function gracefulShutdown(err) {
   });
 }
 
-// start server
 server.listen(config.port, '0.0.0.0', () => {
   logger.info(`Server running on port ${config.port}`);
 
