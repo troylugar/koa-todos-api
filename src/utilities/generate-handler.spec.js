@@ -11,7 +11,7 @@ it('should pass context to controller', async done => {
 
 it('should map results back to context', async done => {
   const body = 'I\'m a little tea pot.';
-  const status = 422;
+  const status = 418;
   const ctx = {};
   const testController = jest.fn(() => ({ body, status }));
   const handler = generateHandler(testController);
@@ -22,7 +22,7 @@ it('should map results back to context', async done => {
 });
 
 it('should default status to 200', async done => {
-  const body = 'I\'m a little tea pot.';
+  const body = 'successful';
   const ctx = {};
   const testController = jest.fn(() => ({ body }));
   const handler = generateHandler(testController);

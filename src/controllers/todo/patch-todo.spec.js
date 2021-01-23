@@ -1,10 +1,7 @@
-afterEach(() => {
-  jest.resetModules();
-});
+const patchTodoWrapper = require('./patch-todo');
 
 it('should return a 200 when todo found', async done => {
   const expected = { title: 'merged' };
-  const patchTodoWrapper = require('./patch-todo');
   const id = 'abcd';
   const update = { title: 'different' };
   const todoServiceFake = {
@@ -23,7 +20,6 @@ it('should return a 200 when todo found', async done => {
 
 it('should return a 404 when todo not found', async done => {
   const NotFoundError = require('../../errors/not-found.error');
-  const patchTodoWrapper = require('./patch-todo');
   const id = 'abcd';
   const update = { title: 'update' };
   const todoServiceFake = {
@@ -37,7 +33,6 @@ it('should return a 404 when todo not found', async done => {
 });
 
 it('should rethrow unhandled errors', async done => {
-  const patchTodoWrapper = require('./patch-todo');
   const id = 'abcd';
   const update = { title: 'update' };
   const todoServiceFake = {

@@ -2,7 +2,6 @@ const TodoModelWrapper = require('./todo.model');
 
 const NOW = Date.now();
 
-
 const uuid = () => 'a_random_id';
 const now = () => NOW;
 
