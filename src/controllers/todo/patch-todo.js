@@ -1,25 +1,21 @@
-const TodoModel = require('../../models/todo');
+const NotFoundError = require('../../errors/not-found.error');
 
 function patchTodoWrapper({ todoService }) {
   return async function patchTodos({ request, params }) {
     const { id } = params;
     const data = request.body;
-    const oldTodo = await todoService.findById(id);
-
-    if (oldTodo) {
-      const updatedTodo = TodoModel({
-        ...oldTodo,
-        ...data
-      });
-      await todoService.updateById(id, updatedTodo);
+    try {
+      const updated = await todoService.updateById(id, data);
       return {
-        body: updatedTodo,
+        body: updated,
         status: 200
       };
-    } else {
-      return {
-        status: 404
-      };
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        return { status: 404 };
+      } else {
+        throw err;
+      }
     }
   };
 }

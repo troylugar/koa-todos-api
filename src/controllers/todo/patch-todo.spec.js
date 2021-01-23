@@ -2,37 +2,49 @@ afterEach(() => {
   jest.resetModules();
 });
 
-it('should return a 404 when todo not found', async done => {
-  const patchTodoWrapper = require('./patch-todo');
-  const id = 'abcd';
-  const todoServiceFake = {
-    findById: jest.fn(() => undefined)
-  };
-  const patchTodo = patchTodoWrapper({ todoService: todoServiceFake });
-  const result = await patchTodo({ params: { id }, request: {} });
-  expect(todoServiceFake.findById).toHaveBeenCalledWith(id);
-  expect(result.status).toBe(404);
-  done();
-});
-
 it('should return a 200 when todo found', async done => {
-  const merged = { title: 'merged' };
-  jest.mock('../../models/todo', () => jest.fn(() => merged));
+  const expected = { title: 'merged' };
   const patchTodoWrapper = require('./patch-todo');
   const id = 'abcd';
-  const expected = { title: 'asdf' };
-  const updated = { title: 'different' };
+  const update = { title: 'different' };
   const todoServiceFake = {
-    findById: jest.fn(() => expected),
-    updateById: jest.fn(() => updated)
+    updateById: jest.fn(() => expected)
   };
   const patchTodo = patchTodoWrapper({ todoService: todoServiceFake });
   const result = await patchTodo({
     params: { id },
-    request: { body: updated }
+    request: { body: update }
   });
-  expect(todoServiceFake.findById).toHaveBeenCalledWith(id);
-  expect(result.body).toBe(merged);
+  expect(todoServiceFake.updateById).toHaveBeenCalledWith(id, update);
+  expect(result.body).toBe(expected);
   expect(result.status).toBe(200);
+  done();
+});
+
+it('should return a 404 when todo not found', async done => {
+  const NotFoundError = require('../../errors/not-found.error');
+  const patchTodoWrapper = require('./patch-todo');
+  const id = 'abcd';
+  const update = { title: 'update' };
+  const todoServiceFake = {
+    updateById: jest.fn(() => { throw new NotFoundError(); })
+  };
+  const patchTodo = patchTodoWrapper({ todoService: todoServiceFake });
+  const result = await patchTodo({ params: { id }, request: { body: update} });
+  expect(todoServiceFake.updateById).toHaveBeenCalledWith(id, update);
+  expect(result.status).toBe(404);
+  done();
+});
+
+it('should rethrow unhandled errors', async done => {
+  const patchTodoWrapper = require('./patch-todo');
+  const id = 'abcd';
+  const update = { title: 'update' };
+  const todoServiceFake = {
+    updateById: jest.fn(() => { throw new Error(); })
+  };
+  const patchTodo = patchTodoWrapper({ todoService: todoServiceFake });
+  await expect(patchTodo({ params: { id }, request: { body: update} })).rejects.toThrow(Error);
+  expect(todoServiceFake.updateById).toHaveBeenCalledWith(id, update);
   done();
 });
