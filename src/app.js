@@ -1,5 +1,5 @@
 const Koa = require('koa');
-const cors = require('koa2-cors');
+const cors = require('@koa/cors');
 const helmet = require('koa-helmet');
 const bodyParser = require('koa-bodyparser');
 const requestLogger = require('./middleware/request-logger');
