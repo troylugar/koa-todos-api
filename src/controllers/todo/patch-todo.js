@@ -11,7 +11,7 @@ function patchTodoWrapper({ todoService }) {
         ...oldTodo,
         ...data
       });
-      todoService.updateById(id, updatedTodo);
+      await todoService.updateById(id, updatedTodo);
       return {
         body: updatedTodo,
         status: 200
