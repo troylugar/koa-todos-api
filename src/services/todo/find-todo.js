@@ -1,6 +1,10 @@
+const NotFoundError = require("../../errors/not-found.error");
+
 function findTodoByIdWrapper({ todoRepository }) {
   return async function findTodoById(id) {
-    return await todoRepository.findById(id);
+    const result = await todoRepository.findById(id);
+    if (!result) throw new NotFoundError();
+    return result;
   };
 }
 

@@ -1,9 +1,10 @@
+const NotFoundError = require('../../errors/not-found.error');
 const getTodoWrapper = require('./get-todo');
 
 it('should return a 404 when todo not found', async done => {
   const id = 'abcd';
   const todoServiceFake = {
-    findById: jest.fn(() => undefined)
+    findById: jest.fn(() => { throw new NotFoundError(); })
   };
   const getTodo = getTodoWrapper({todoService: todoServiceFake});
   const result = await getTodo({ params: { id } });
