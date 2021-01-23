@@ -1,7 +1,7 @@
 const TodoModel = require('../../models/todo');
 
-function postTodosWrapper({ todoService, logger }) {
-  return async function postTodos({ request }) {
+function postTodoWrapper({ todoService, logger }) {
+  return async function postTodo({ request }) {
     const data = request.body;
     try {
       const todo = TodoModel(data);
@@ -17,4 +17,4 @@ function postTodosWrapper({ todoService, logger }) {
   };
 }
 
-module.exports = postTodosWrapper;
+module.exports = postTodoWrapper;

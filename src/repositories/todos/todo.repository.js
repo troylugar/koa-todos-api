@@ -12,7 +12,7 @@ function toModel(entity) {
     : undefined;
 }
 
-function todosDbWrapper({ schema }) {
+function todoRepositoryWrapper({ schema }) {
   async function find() {
     const result = await schema.find();
     return result.map(toModel);
@@ -48,4 +48,4 @@ function todosDbWrapper({ schema }) {
   };
 }
 
-module.exports = todosDbWrapper;
+module.exports = todoRepositoryWrapper;
