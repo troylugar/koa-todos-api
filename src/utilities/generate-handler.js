@@ -1,13 +1,8 @@
 function generateHandler(controller) {
   return async function (ctx) {
-    try {
-      const results = await controller(ctx);
-      ctx.body = results.body;
-      ctx.status = results.status || 200;
-    } catch (error) {
-      ctx.body = error;
-      ctx.status = 500;
-    }
+    const results = await controller(ctx);
+    ctx.body = results && results.body;
+    ctx.status = results && results.status || 200;
   };
 }
 

@@ -1,9 +1,9 @@
 const TodoModel = require('../../models/todo');
 
 function patchTodoWrapper({ todoService }) {
-  return async function patchTodos(request) {
-    const { id } = request.params;
-    const data = request.body;
+  return async function patchTodos(context) {
+    const { id } = context.params;
+    const data = context.request.body;
     const oldTodo = await todoService.findById(id);
 
     if (oldTodo) {

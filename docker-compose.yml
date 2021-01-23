@@ -3,9 +3,9 @@ services:
   web:
     build: .
     ports:
-      - "49160:3000"
+      - "3000:3000"
     expose:
-      - "49160"
+      - "3000"
     environment:
       - MONGO_URI=mongodb://mongoadmin:secret@db:27017/todos?authSource=admin
     depends_on:

@@ -32,13 +32,11 @@ it('should default status to 200', async done => {
   done();
 });
 
-it('should handle errors', async done => {
+it('should allow errors to bubble up', async done => {
   const error = new Error('asdf');
   const ctx = {};
   const testController = jest.fn(() => { throw error; });
   const handler = generateHandler(testController);
-  await handler(ctx);
-  expect(ctx.body).toBe(error);
-  expect(ctx.status).toBe(500);
+  await expect(handler(ctx)).rejects.toThrowError(error);
   done();
 });
