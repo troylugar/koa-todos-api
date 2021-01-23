@@ -1,9 +1,10 @@
+const NotFoundError = require('../../errors/not-found.error');
 const deleteTodoWrapper = require('./delete-todo');
 
-it('should return a 404 when todo not found', async done => {
+it('should return a 404 when NotFoundError thrown', async done => {
   const id = 'abcd';
   const todoServiceFake = {
-    deleteById: jest.fn(() => undefined)
+    deleteById: jest.fn(() => { throw new NotFoundError(); })
   };
   const deleteTodo = deleteTodoWrapper({todoService: todoServiceFake});
   const result = await deleteTodo({ params: { id } });
@@ -12,11 +13,21 @@ it('should return a 404 when todo not found', async done => {
   done();
 });
 
+it('should throw unhandled errors', async done => {
+  const id = 'abcd';
+  const todoServiceFake = {
+    deleteById: jest.fn(() => { throw new Error(); })
+  };
+  const deleteTodo = deleteTodoWrapper({todoService: todoServiceFake});
+  await expect(deleteTodo({ params: { id } })).rejects.toThrow(Error);
+  expect(todoServiceFake.deleteById).toHaveBeenCalledWith(id);
+  done();
+});
+
 it('should return a 204 when todo found and deleted', async done => {
   const id = 'abcd';
-  const expected = { title: 'asdf' };
   const todoServiceFake = {
-    deleteById: jest.fn(() => expected)
+    deleteById: jest.fn()
   };
   const deleteTodo = deleteTodoWrapper({todoService: todoServiceFake});
   const result = await deleteTodo({ params: { id } });
