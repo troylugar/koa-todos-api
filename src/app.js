@@ -6,7 +6,7 @@ const bodyParser = require('koa-bodyparser');
 const requestLogger = require('./middleware/request-logger');
 const healthcheck = require('./middleware/health-check');
 const generateRouter = require('./utilities/generate-router');
-const todoController = require('./controllers/todos');
+const todoController = require('./controllers/todo');
 
 // setup app
 const app = new Koa();

@@ -1,5 +1,5 @@
 const logger = require('../../utilities/logger');
-const todoService = require('../../services/todo-service');
+const todoService = require('../../services/todo');
 
 const getTodosWrapper = require('./get-todos');
 const getTodos = getTodosWrapper({ todoService });
@@ -16,10 +16,12 @@ const patchTodo = patchTodoWrapper({ todoService, logger });
 const deleteTodoWrapper = require('./delete-todo');
 const deleteTodo = deleteTodoWrapper({ todoService, logger });
 
-module.exports = [
+const todoController = [
   { method: 'GET', path: '/', controller: getTodos },
   { method: 'GET', path: '/:id', controller: getTodo },
   { method: 'POST', path: '/', controller: postTodo },
   { method: 'PATCH', path: '/:id', controller: patchTodo },
   { method: 'DELETE', path: '/:id', controller: deleteTodo }
 ];
+
+module.exports = todoController;

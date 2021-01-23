@@ -1,4 +1,4 @@
-const todoRepository = require('../../repositories/todos');
+const todoRepository = require('../../repositories/todo');
 const todoService = {
   create: require('./create-todo')({todoRepository}),
   findById: require('./find-todo')({todoRepository}),
