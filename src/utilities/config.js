@@ -11,5 +11,5 @@ module.exports = {
   node_env: process.env.NODE_ENV,
   auth_public_key: fs.readFileSync('public_key.pem'),
   auth_private_key: fs.readFileSync('private_key.pem'),
-  salt_rounds: process.env.SALT_ROUNDS,
+  salt_rounds: +process.env.SALT_ROUNDS,
 };

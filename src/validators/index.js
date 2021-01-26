@@ -4,3 +4,4 @@ module.exports.isString = require('./is-string');
 module.exports.hasMinLength = require('./has-min-length.js');
 module.exports.containsSpecialChars = require('./contains-special-chars');
 module.exports.containsNumbers = require('./contains-numbers');
+module.exports.isFalsy = require('./is-falsy');
