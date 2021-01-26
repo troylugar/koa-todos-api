@@ -1,4 +1,5 @@
 const NotFoundError = require('../../errors/not-found.error');
+const ValidationError = require('../../errors/validation.error');
 
 function patchTodoWrapper({ todoService }) {
   return async function patchTodos({ request, params }) {
@@ -13,6 +14,8 @@ function patchTodoWrapper({ todoService }) {
     } catch (err) {
       if (err instanceof NotFoundError) {
         return { status: 404 };
+      } else if (err instanceof ValidationError) {
+        return { body: err.message, status: 400 };
       } else {
         throw err;
       }

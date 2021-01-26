@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
 const TodoWrapper = require('./todo.model');
 const validators = require('../../validators');
+const uuid = require('../../utilities/generate-uuid');
+const now = require('../../utilities/generate-date');
 
-const uuid = () => mongoose.Types.ObjectId();
-const now = () => Date.now();
 const TodoModel = TodoWrapper({
   uuid,
   now,
