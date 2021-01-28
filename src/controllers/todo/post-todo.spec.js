@@ -6,7 +6,7 @@ const ValidationError = require('../../errors/validation.error');
 jest.mock('../../models/todo');
 jest.mock('../../services/todo');
 
-const postTodo = postTodoWrapper({todoService});
+const postTodo = postTodoWrapper({ todoService });
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -15,12 +15,9 @@ afterEach(() => {
 it('should return a 201 when todo created', async done => {
   const body = { title: 'post test' };
   TodoModel.mockImplementation(() => body);
-  const todoServiceFake = {
-    create: jest.fn(() => body)
-  };
-  const postTodo = postTodoWrapper({todoService: todoServiceFake});
+  todoService.create.mockImplementation(() => body);
   const result = await postTodo({ request: { body } });
-  expect(todoServiceFake.create).toHaveBeenCalledWith(body);
+  expect(todoService.create).toHaveBeenCalledWith(body);
   expect(result.status).toBe(201);
   expect(result.body).toBe(body);
   done();
