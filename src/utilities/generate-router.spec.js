@@ -1,33 +1,34 @@
-require('koa-router');
+const Router = require('@koa/router');
 const generateHandler = require('./generate-handler');
-const mockGet = jest.fn();
-const mockPost = jest.fn();
-const mockHandler = jest.fn();
+const generateRouter = require('./generate-router');
 
-jest.mock('koa-router', () =>
-  jest.fn().mockImplementation(() => ({
-    get: mockGet,
-    post: mockPost
-  })));
+jest.mock('@koa/router');
+jest.mock('./generate-handler');
 
-jest.mock('./generate-handler', () => {
-  return jest.fn(() => {
-    return mockHandler;
-  });
+afterEach(() => {
+  Router.mockReset();
+  generateHandler.mockReset();
 });
 
-
 it('should call router functions based on route method', () => {
-  const generateRouter = require('./generate-router');
   const getRoute = { method: 'GET', path: '/', controller: jest.fn() };
   const postRoute = { method: 'POST', path: '/:id', controller: jest.fn() };
   const routes = [
     getRoute,
     postRoute
   ];
+
+  const mockRouter = {
+    get: jest.fn(),
+    post: jest.fn()
+  };
+  const mockHandler = jest.fn();
+  Router.mockImplementation(() => mockRouter);
+  generateHandler.mockImplementation(() => mockHandler);
+
   generateRouter(routes);
   expect(generateHandler).toHaveBeenCalledWith(getRoute.controller);
-  expect(mockGet).toHaveBeenCalledWith(getRoute.path, mockHandler);
+  expect(mockRouter.get).toHaveBeenCalledWith(getRoute.path, mockHandler);
   expect(generateHandler).toHaveBeenCalledWith(postRoute.controller);
-  expect(mockPost).toHaveBeenCalledWith(postRoute.path, mockHandler);
+  expect(mockRouter.post).toHaveBeenCalledWith(postRoute.path, mockHandler);
 });

@@ -1,4 +1,4 @@
-const Router = require('koa-router');
+const Router = require('@koa/router');
 const generateHandler = require('./generate-handler');
 
 function generateRouter(routes) {
