@@ -18,7 +18,7 @@ it('should transform handlable errors into AuthenticationError', () => {
   );
 });
 
-it('should transform errors from jsonwebtoken into AuthenticationError', () => {
+it('should throw unhandled errors', () => {
   const token = 'not_a_token';
   jwt.verify.mockImplementation(() => { throw new Error('asdf'); });
   expect(() => {
