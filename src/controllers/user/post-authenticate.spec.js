@@ -1,12 +1,12 @@
+const { userService } = require('../../services');
 const AuthenticationError = require('../../errors/authentication.error');
-const postAuthenticateWrapper = require('./post-authenticate');
+const postAuthenticate = require('./post-authenticate');
+
+jest.mock('../../services');
 
 it('should return token when authentication is successful', async done => {
   const token = { uid: 'abc123' };
-  const userService = {
-    authenticate: jest.fn(() => token)
-  };
-  const postAuthenticate = postAuthenticateWrapper({ userService });
+  userService.authenticate.mockImplementation(() => token);
   const context = {
     request: {
       body: { username: 'troy', password: 'password' }
@@ -19,13 +19,10 @@ it('should return token when authentication is successful', async done => {
 });
 
 it('should return a 401 when AuthenticationError thrown', async done => {
-  const errorMessage = 'username and password do not match';
-  const userService = {
-    authenticate: jest.fn(() => {
-      throw new AuthenticationError(errorMessage);
-    })
-  };
-  const postAuthenticate = postAuthenticateWrapper({ userService });
+  const error = new AuthenticationError('username and password do not match');
+  userService.authenticate.mockImplementation(() => {
+    throw error;
+  });
   const context = {
     request: {
       body: { username: 'troy', password: 'password' }
@@ -33,17 +30,14 @@ it('should return a 401 when AuthenticationError thrown', async done => {
   };
   const result = await postAuthenticate(context);
   expect(result.status).toBe(401);
-  expect(result.body).toBe(errorMessage);
+  expect(result.body).toBe(error);
   done();
 });
 
 it('should throw unhandled errors', async done => {
-  const userService = {
-    authenticate: jest.fn(() => {
-      throw new Error();
-    })
-  };
-  const postAuthenticate = postAuthenticateWrapper({ userService });
+  userService.authenticate.mockImplementation(() => {
+    throw new Error();
+  });
   const context = {
     request: {
       body: { username: 'troy', password: 'password' }

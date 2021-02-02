@@ -4,5 +4,6 @@ COPY package*.json ./
 RUN npm ci
 COPY *.pem ./
 COPY src ./src
+RUN npm install pm2 -g
 EXPOSE 3000
-CMD [ "node", "src/server.js" ]
+CMD [ "pm2-runtime", "npm", "--", "start" ]

@@ -5,8 +5,9 @@ function generateRouter(routes) {
   const router = new Router();
   for (let route of routes) {
     const method = route.method.toLowerCase();
-    const handler = generateHandler(route.controller);
-    router[method](route.path, handler);
+    const middleware = (route.middleware || []);
+    const handlers  = [...middleware, generateHandler(route.controller)];
+    router[method](route.path, ...handlers);
   }
   return router;
 }

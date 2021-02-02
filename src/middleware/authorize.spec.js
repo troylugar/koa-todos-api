@@ -1,47 +1,20 @@
-let jwt, auth;
+const verifyToken = require('../utilities/verify-token');
+const auth = require('./authorize');
+const AuthenticationError = require('../errors/authentication.error');
 
-const {
-  auth_private_key: privateKey
-} = require('../utilities/config');
-
-beforeEach(() => {
-  jwt = require('jsonwebtoken');
-  auth = require('./authorize');
-});
-
-it('should add token payload to context given a valid token', async done => {
-  const payload = {
-    user: 'troy'
-  };
-  const token = jwt.sign(payload, privateKey, {
-    algorithm: 'RS256',
-    expiresIn: 60 * 60
-  });
-  const ctx = {
-    request: {
-      headers: {
-        auth: 'Bearer ' + token
-      }
-    }
-  };
-  const mockNext = jest.fn();
-  auth(ctx, mockNext);
-  expect(ctx.token.user).toBe(payload.user);
-  expect(mockNext).toHaveBeenCalledWith(ctx);
-  done();
-});
+jest.mock('../utilities/verify-token');
 
 it('should verify a valid token', async done => {
-  const token = jwt.sign({asdf: 'jkl'}, privateKey, { algorithm: 'RS256', expiresIn: 60 * 60 });
   const ctx = {
     request: {
       headers: {
-        auth: 'Bearer ' + token
+        auth: 'Bearer qwerty'
       }
     }
   };
-  const mockNext = jest.fn;
-  const result = auth(ctx, mockNext);
+  verifyToken.mockImplementation(() => ({asdf: 'jkl'}));
+  const mockNext = jest.fn();
+  const result = await auth(ctx, mockNext);
   expect(result).toBeUndefined();
   expect(ctx.token.asdf).toBe('jkl');
   done();
@@ -54,13 +27,15 @@ it('should return Not Authorized when no auth header given', async done => {
       }
     }
   };
-  const mockNext = jest.fn;
-  const result = auth(ctx, mockNext);
-  expect(result.status).toBe(401);
+  const mockNext = jest.fn();
+  await auth(ctx, mockNext);
+  expect(ctx.status).toBe(401);
   done();
 });
 
-it('should return Not Authorized given a malformed token', async done => {
+it('should return Not Authorized when verified unsuccessfully', async done => {
+  const mockError = 'error message';
+  verifyToken.mockImplementation(() => { throw new AuthenticationError(mockError); });
   const ctx = {
     request: {
       headers: {
@@ -68,22 +43,23 @@ it('should return Not Authorized given a malformed token', async done => {
       }
     }
   };
-  const mockNext = jest.fn;
-  const result = auth(ctx, mockNext);
-  expect(result.status).toBe(401);
+  const mockNext = jest.fn();
+  await auth(ctx, mockNext);
+  expect(ctx.status).toBe(401);
+  expect(ctx.body.message).toBe(mockError);
   done();
 });
 
-it('should return Not Authorized given an invalid token', async done => {
+it('should throw unhandled errors', async done => {
+  verifyToken.mockImplementation(() => { throw new Error('asdf'); });
   const ctx = {
     request: {
       headers: {
-        auth: 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.POstGetfAytaZS82wHcjoTyoqhMyxXiWdR7Nn7A29DNSl0EiXLdwJ6xC6AfgZWF1bOsS_TuYI3OG85AmiExREkrS6tDfTQ2B3WXlrr-wp5AokiRbz3_oB4OxG-W9KcEEbDRcZc0nH3L7LzYptiy1PtAylQGxHTWZXtGz4ht0bAecBgmpdgXMguEIcoqPJ1n3pIWk_dUZegpqx0Lka21H6XxUTxiy8OcaarA8zdnPUnV6AmNP3ecFawIFYdvJB_cm-GvpCSbr8G8y_Mllj8f4x9nBH8pQux89_6gUY618iYv7tuPWBFfEbLxtF2pZS6YC1aSfLQxeNe8djT9YjpvRZA'
+        auth: 'Bearer asdf'
       }
     }
   };
-  const mockNext = jest.fn;
-  const result = auth(ctx, mockNext);
-  expect(result.status).toBe(401);
+  const mockNext = jest.fn();
+  await expect(auth(ctx, mockNext)).rejects.toThrow('asdf');
   done();
 });

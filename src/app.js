@@ -5,6 +5,7 @@ const bodyParser = require('koa-bodyparser');
 const requestLogger = require('./middleware/request-logger');
 const healthcheck = require('./middleware/health-check');
 const routes = require('./routes');
+const db = require('./db');
 
 // setup app
 const app = new Koa();
@@ -18,5 +19,9 @@ app.use(cors({
 }));
 app.use(healthcheck());
 app.use(routes.routes());
+
+db.once('connected', () => {
+  app.emit('ready');
+});
 
 module.exports = app;

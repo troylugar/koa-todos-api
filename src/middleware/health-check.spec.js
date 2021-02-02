@@ -1,12 +1,10 @@
-const mongoose = require('mongoose');
-const healthcheck = require('../../src/middleware/health-check');
+const db = require('../db');
+const healthcheck = require('./health-check');
 const Koa = require('koa');
 const supertest = require('supertest');
 const mockdate = require('mockdate');
 
-jest.mock('mongoose', () => ({
-  connection: { readyState: 1 }
-}));
+jest.mock('../db');
 
 const app = new Koa();
 app.use(healthcheck());
@@ -35,17 +33,17 @@ it('should return current timestamp', (done) => {
 });
 
 it('should show mongo status as "up" when mongo is up', (done) => {
-  mongoose.connection.readyState = 1;
+  db.readyState = 1;
   request.get('/health-check').then(res => {
-    expect(res.body.mongo.status).toBe('up');
+    expect(res.body.db.status).toBe('up');
     done();
   }).catch(done);
 });
 
 it('should show mongo status as "down" when mongo is down', (done) => {
-  mongoose.connection.readyState = 0;
+  db.readyState = 0;
   request.get('/health-check').then(res => {
-    expect(res.body.mongo.status).toBe('down');
+    expect(res.body.db.status).toBe('down');
     done();
   }).catch(done);
 });

@@ -5,11 +5,18 @@ if (process.env.NODE_ENV !== 'production') {
 
 // mapping the environment helps to decouple
 // the code from specific environment vars
-module.exports = {
+
+const config = {
   port: +process.env.PORT || 3000,
-  mongo_uri: process.env.MONGO_URI,
+  mongoUri: process.env.MONGO_URI,
   node_env: process.env.NODE_ENV,
-  auth_public_key: fs.readFileSync('public_key.pem'),
-  auth_private_key: fs.readFileSync('private_key.pem'),
-  salt_rounds: +process.env.SALT_ROUNDS,
+  publicKey: process.env.AUTH_PUBLIC_KEY || fs.readFileSync('public_key.pem'),
+  privateKey: process.env.AUTH_PRIVATE_KEY || fs.readFileSync('private_key.pem'),
+  saltRounds: +process.env.SALT_ROUNDS,
+  jwt: {
+    algorithm: process.env.JWT_ALGORITHM,
+    expiresIn: process.env.JWT_EXPIRES_IN
+  }
 };
+
+module.exports = config;

@@ -1,27 +1,8 @@
 const http = require('http');
-const mongoose = require('mongoose');
 const config = require('./utilities/config');
 const logger = require('./utilities/logger');
 const app = require('./app');
-
-mongoose.connect(config.mongo_uri, {
-  useUnifiedTopology: true,
-  useNewUrlParser: true
-});
-const db = mongoose.connection;
-db.on('error', error => {
-  logger.error(error);
-});
-db.once('connected', () => {
-  logger.info('Mongo connected');
-  app.emit('ready');
-});
-db.on('reconnected', () => {
-  logger.info('Mongo re-connected');
-});
-db.on('disconnected', () => {
-  logger.info('Mongo disconnected');
-});
+const db = require('./db');
 
 const server = http.createServer(app.callback());
 
@@ -30,8 +11,8 @@ async function gracefulShutdown(err) {
     logger.error(err);
   }
 
-  await mongoose.connection.close(false);
-  logger.info('Mongo connection has closed.');
+  await db.close(false);
+  logger.info('Database connection has closed.');
 
   server.close((serverError) => {
     if (serverError) {

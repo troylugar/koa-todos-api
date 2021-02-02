@@ -1,20 +1,27 @@
-const jwt = require('jsonwebtoken');
-const config = require('../utilities/config');
-const publicKey = config.auth_public_key;
-const NOT_AUTHORIZED = { status: 401 };
+const verifyToken = require('../utilities/verify-token');
+const AuthenticationError = require('../errors/authentication.error');
 
-function auth(ctx, next) {
-  const header = ctx.request.headers.auth;
-  if (!header) {
-    return NOT_AUTHORIZED;
+function getTokenFromHeaders(headers) {
+  const header = headers.auth;
+  const token = header && header.split('Bearer ')[1];
+  if (!token) {
+    throw new AuthenticationError('No token provided');
   }
-  const token = header.split('Bearer ')[1];
+  return token;
+}
+
+async function auth(ctx, next) {
   try {
-    const decoded = jwt.verify(token, publicKey, { algorithm: 'RS256' });
-    ctx.token = decoded;
-    next(ctx);
+    const token = getTokenFromHeaders(ctx.request.headers);
+    ctx.token = verifyToken(token);
+    await next(ctx);
   } catch (err) {
-    return NOT_AUTHORIZED;
+    if (err instanceof AuthenticationError) {
+      ctx.body = err;
+      ctx.status = 401;
+    } else {
+      throw err;
+    }
   }
 }
 

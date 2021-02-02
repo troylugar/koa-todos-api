@@ -1,20 +1,20 @@
 const Router = require('@koa/router');
-const { connection } = require('mongoose');
+const db = require('../db');
 
-function getMongoStatus() {
-  return connection.readyState === 1
+function getDbStatus() {
+  return db.readyState === 1
     ? 'up'
     : 'down';
 }
 
 const router = new Router();
-router.get('/health-check', async (ctx) => {
+router.get('/health-check', async ctx => {
   ctx.status = 200;
   ctx.body = {
     status: 'up',
     timestamp: new Date(),
-    mongo: {
-      status: getMongoStatus()
+    db: {
+      status: getDbStatus()
     }
   };
 });

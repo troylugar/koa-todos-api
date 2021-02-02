@@ -1,11 +1,15 @@
-const getTodosWrapper = require('./get-todos');
+const { todoService } = require('../../services');
+const getTodos = require('./get-todos');
+
+jest.mock('../../services');
+
+afterEach(() => {
+  jest.resetAllMocks();
+});
 
 it('should return a 200 given an array of objects', async done => {
   const expected = [{ title: 'Fake todo' }];
-  const todoServiceFake = {
-    list: jest.fn(() => Promise.resolve(expected))
-  };
-  const getTodos = getTodosWrapper({todoService: todoServiceFake });
+  todoService.list.mockImplementation(() => Promise.resolve(expected));
   const result = await getTodos();
   expect(result.body).toStrictEqual(expected);
   expect(result.status).toBe(200);
@@ -14,10 +18,7 @@ it('should return a 200 given an array of objects', async done => {
 
 it('should return a 200 given an empty array', async done => {
   const expected = [];
-  const todoServiceFake = {
-    list: jest.fn(() => Promise.resolve(expected))
-  };
-  const getTodos = getTodosWrapper({todoService: todoServiceFake });
+  todoService.list.mockImplementation(() => Promise.resolve(expected));
   const result = await getTodos();
   expect(result.body).toStrictEqual(expected);
   expect(result.status).toBe(200);

@@ -1,10 +1,5 @@
-const userService = require('../../services/user');
-
-const postAuthenticateWrapper = require('./post-authenticate');
-const postAuthenticate = postAuthenticateWrapper({ userService });
-
-const postRegisterWrapper = require('./post-register');
-const postRegister = postRegisterWrapper({ userService });
+const postAuthenticate = require('./post-authenticate');
+const postRegister = require('./post-register');
 
 const routes = [
   { method: 'POST', path: '/auth', controller: postAuthenticate },
