@@ -1,4 +1,4 @@
-const UserModel = require('../models/user');
+const User = require('../models/user');
 const AuthenticationError = require('../errors/authentication.error');
 const generateToken = require('../utilities/generate-token');
 const comparePassword = require('../utilities/compare-password');
@@ -40,7 +40,7 @@ class UserService {
       validate(password, containsNumbers, 'password must contain at least 1 number')
     );
     const hashedPassword = await hashPassword(password);
-    const model = UserModel({
+    const model = new User({
       ...userData,
       password: hashedPassword
     });

@@ -1,19 +1,22 @@
-const TodoModelWrapper = require('./todo.model');
+const uuid = require('../../utilities/generate-uuid');
+const now = require('../../utilities/generate-date');
+const validators = require('../../validators');
+const Todo = require('./todo.model');
 
-const NOW = Date.now();
+const mockNow = Date.now();
 
-const uuid = () => 'a_random_id';
-const now = () => NOW;
+jest.mock('../../utilities/generate-uuid');
+uuid.mockReturnValue('a_random_id');
+jest.mock('../../utilities/generate-date');
+now.mockReturnValue(mockNow);
+jest.mock('../../validators');
 
 describe('successful validation', () => {
   const minLength = jest.fn();
-  const validators = {
-    isString: jest.fn(),
-    hasMinLength: jest.fn(() => minLength),
-    validate: jest.fn(),
-    validateMultiple: jest.fn()
-  };
-  const TodoModel = TodoModelWrapper({ uuid, now, validators });
+  validators.isString.mockImplementation();
+  validators.hasMinLength.mockImplementation(() => minLength);
+  validators.validate.mockImplementation();
+  validators.validateMultiple.mockImplementation();
 
   it('should create a todo from args', () => {
     const data = {
@@ -23,8 +26,8 @@ describe('successful validation', () => {
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
-    const myModel = TodoModel(data);
-    expect(myModel).toStrictEqual(data);
+    const myModel = new Todo(data);
+    expect(myModel).toEqual(data);
   });
 
   it('should create a todo from defaults', () => {
@@ -33,23 +36,23 @@ describe('successful validation', () => {
       id: uuid(),
       title,
       completed: false,
-      createdAt: NOW,
-      updatedAt: NOW
+      createdAt: mockNow,
+      updatedAt: mockNow
     };
-    const myModel = TodoModel({ title });
-    expect(myModel).toStrictEqual(defaults);
+    const myModel = new Todo({ title });
+    expect(myModel).toEqual(defaults);
   });
 
   it('should validate that title is a string', () => {
     const title = 'this is the title';
-    TodoModel({ title });
+    new Todo({ title });
     const expectedMessage = 'title must be a string';
     expect(validators.validate).toHaveBeenCalledWith(title, validators.isString, expectedMessage);
   });
 
   it('should validate that title has a length >= 3', () => {
     const title = 'this is the title';
-    TodoModel({ title });
+    new Todo({ title });
     const expectedMessage = 'title must have a length >= 3';
     expect(validators.hasMinLength).toHaveBeenCalledWith(3);
     expect(validators.validate).toHaveBeenCalledWith(title, minLength, expectedMessage);
@@ -57,16 +60,9 @@ describe('successful validation', () => {
 });
 
 describe('unsuccessful validation', () => {
-  const error = new Error('error message');
-  const validators = {
-    isString: jest.fn(),
-    hasMinLength: () => jest.fn(),
-    validate: () => jest.fn()
-  };
-
   it('should throw error upon unsuccessful validation', () => {
-    validators.validateMultiple = jest.fn(() => { throw error; });
-    const TodoModel = TodoModelWrapper({ uuid, now, validators });
-    expect(() => TodoModel()).toThrowError(error.message);
+    const error = new Error('error message');
+    validators.validateMultiple.mockImplementation(() => { throw error; });
+    expect(() => new Todo()).toThrow(error);
   });
 });

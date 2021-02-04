@@ -1,4 +1,4 @@
-const TodoModel = require('../models/todo');
+const Todo = require('../models/todo');
 
 class TodoRepository {
   constructor(schema) {
@@ -34,7 +34,7 @@ class TodoRepository {
 
 function toModel(entity) {
   return entity
-    ? TodoModel({
+    ? new Todo({
       id: entity._id,
       title: entity.title,
       completed: entity.completed,

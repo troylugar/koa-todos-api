@@ -1,4 +1,4 @@
-const UserModel = require('../models/user');
+const User = require('../models/user');
 
 class UserRepository {
   constructor(schema) {
@@ -44,7 +44,7 @@ class UserRepository {
 
 function toModel(entity) {
   return entity
-    ? UserModel({
+    ? new User({
       id: entity._id,
       username: entity.username,
       password: entity.password,

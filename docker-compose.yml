@@ -8,6 +8,8 @@ services:
       - "3000"
     environment:
       - MONGO_URI=mongodb://mongoadmin:secret@db:27017/todos?authSource=admin
+      - JWT_ALGORITHM=RS256
+      - JWT_EXPIRES_IN=5m
     depends_on:
       - db
     command: bash -c "

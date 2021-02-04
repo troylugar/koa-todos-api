@@ -1,5 +1,5 @@
 const NotFoundError = require('../errors/not-found.error');
-const TodoModel = require('../models/todo');
+const Todo = require('../models/todo');
 const TodoService = require('./todo.service');
 
 jest.mock('../models/todo');
@@ -48,7 +48,7 @@ describe('updateById', () => {
     const mockMerged = { ...mockFound, ...update };
     mockTodoRepository.findById = jest.fn(() => mockFound);
     mockTodoRepository.findByIdAndUpdate = jest.fn();
-    TodoModel.mockImplementation(() => mockMerged);
+    Todo.mockImplementation(() => mockMerged);
   
     const result = await todoService.updateById(id, update);
     expect(result).toStrictEqual(mockMerged);

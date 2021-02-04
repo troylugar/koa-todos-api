@@ -1,11 +1,11 @@
 const { todoService } = require('../../services');
 const ValidationError = require('../../errors/validation.error');
-const TodoModel = require('../../models/todo');
+const Todo = require('../../models/todo');
 
 async function postTodo({ request }) {
   const data = request.body;
   try {
-    const todo = TodoModel(data);
+    const todo = new Todo(data);
     const results = await todoService.create(todo);
     return {
       body: results,

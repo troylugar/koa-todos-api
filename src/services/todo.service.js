@@ -1,5 +1,5 @@
 const NotFoundError = require('../errors/not-found.error');
-const TodoModel = require('../models/todo');
+const Todo = require('../models/todo');
 
 class TodoService {
   constructor(todoRepository) {
@@ -19,7 +19,7 @@ class TodoService {
   async updateById(id, updates) {
     const todo = await this.todoRepository.findById(id);
     if (!todo) throw new NotFoundError();
-    const updatedTodo = TodoModel({
+    const updatedTodo = new Todo({
       ...todo,
       ...updates
     });

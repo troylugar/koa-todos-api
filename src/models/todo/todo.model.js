@@ -1,6 +1,11 @@
-function todoWrapper({ uuid, now, validators }) {
-  const { isString, hasMinLength, validate, validateMultiple } = validators;
-  return function todo({
+const uuid = require('../../utilities/generate-uuid');
+const now = require('../../utilities/generate-date');
+const validators = require('../../validators');
+
+const { isString, hasMinLength, validate, validateMultiple } = validators;
+
+class Todo {
+  constructor({
     id = uuid(),
     title,
     completed = false,
@@ -12,14 +17,12 @@ function todoWrapper({ uuid, now, validators }) {
       validate(title, hasMinLength(3), 'title must have a length >= 3'),
     );
 
-    return {
-      id,
-      title,
-      completed,
-      updatedAt,
-      createdAt
-    };
-  };
+    this.id = id;
+    this.title = title;
+    this.completed = completed;
+    this.updatedAt = updatedAt;
+    this.createdAt = createdAt;
+  }
 }
 
-module.exports = todoWrapper;
+module.exports = Todo;

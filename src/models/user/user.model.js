@@ -1,6 +1,11 @@
-function userModelWrapper({ uuid, now, validators }) {
-  const { validateMultiple, validate, isString, hasMinLength } = validators;
-  return function userModel({
+const uuid = require('../../utilities/generate-uuid');
+const now = require('../../utilities/generate-date');
+const validators = require('../../validators');
+
+const { isString, hasMinLength, validate, validateMultiple } = validators;
+
+class User {
+  constructor({
     id = uuid(),
     username,
     password,
@@ -12,16 +17,14 @@ function userModelWrapper({ uuid, now, validators }) {
       validate(username, isString, 'username must be a string'),
       validate(username, hasMinLength(3), 'username must have length >= 3')
     );
-    
-    return {
-      id,
-      username,
-      password,
-      roles,
-      createdAt,
-      updatedAt
-    };
-  };
+
+    this.id = id;
+    this.username = username;
+    this.password = password;
+    this.roles = roles;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+  }
 }
 
-module.exports = userModelWrapper;
+module.exports = User;
