@@ -1,5 +1,5 @@
 const NotFoundError = require('../errors/not-found.error');
-const Todo = require('../models/todo');
+const { Todo } = require('../models');
 
 class TodoService {
   constructor(todoRepository) {

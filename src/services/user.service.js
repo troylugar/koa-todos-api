@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const { User } = require('../models');
 const AuthenticationError = require('../errors/authentication.error');
 const generateToken = require('../utilities/generate-token');
 const comparePassword = require('../utilities/compare-password');

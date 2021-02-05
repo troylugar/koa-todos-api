@@ -1,15 +1,15 @@
-const uuid = require('../../utilities/generate-uuid');
-const now = require('../../utilities/generate-date');
-const validators = require('../../validators');
+const uuid = require('../utilities/generate-uuid');
+const now = require('../utilities/generate-date');
+const validators = require('../validators');
 const Todo = require('./todo.model');
 
 const mockNow = Date.now();
 
-jest.mock('../../utilities/generate-uuid');
+jest.mock('../utilities/generate-uuid');
 uuid.mockReturnValue('a_random_id');
-jest.mock('../../utilities/generate-date');
+jest.mock('../utilities/generate-date');
 now.mockReturnValue(mockNow);
-jest.mock('../../validators');
+jest.mock('../validators');
 
 describe('successful validation', () => {
   const minLength = jest.fn();

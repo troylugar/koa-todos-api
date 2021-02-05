@@ -1,8 +1,11 @@
-const uuid = require('../../utilities/generate-uuid');
-const now = require('../../utilities/generate-date');
-const validators = require('../../validators');
-
-const { isString, hasMinLength, validate, validateMultiple } = validators;
+const uuid = require('../utilities/generate-uuid');
+const now = require('../utilities/generate-date');
+const {
+  isString,
+  hasMinLength,
+  validate,
+  validateMultiple
+} = require('../validators');
 
 class User {
   constructor({

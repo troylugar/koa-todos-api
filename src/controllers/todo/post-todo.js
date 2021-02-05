@@ -1,6 +1,6 @@
 const { todoService } = require('../../services');
 const ValidationError = require('../../errors/validation.error');
-const Todo = require('../../models/todo');
+const { Todo } = require('../../models');
 
 async function postTodo({ request }) {
   const data = request.body;

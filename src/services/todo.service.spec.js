@@ -1,8 +1,8 @@
 const NotFoundError = require('../errors/not-found.error');
-const Todo = require('../models/todo');
+const { Todo } = require('../models');
 const TodoService = require('./todo.service');
 
-jest.mock('../models/todo');
+jest.mock('../models');
 
 const mockTodoRepository = {};
 const todoService = new TodoService(mockTodoRepository);
